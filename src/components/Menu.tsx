@@ -8,6 +8,8 @@ import {
     NavItem,
     NavLink,
 } from 'reactstrap';
+import { Link } from 'react-router-dom';
+
 
 const Menu = () => {
     const [
@@ -36,10 +38,16 @@ const Menu = () => {
                         navbar
                     >
                         <NavItem>
-                            <NavLink href="/">Home</NavLink>
+                            <NavLink
+                                tag={Link}
+                                to="/"
+                            >Home</NavLink>
                         </NavItem>
                         <NavItem>
-                            <NavLink href="/items/">Items</NavLink>
+                            <NavLink
+                                tag={Link}
+                                to="/items/"
+                            >Items</NavLink>
                         </NavItem>
                     </Nav>
                 </Collapse>

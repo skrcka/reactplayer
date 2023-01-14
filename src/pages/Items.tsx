@@ -1,22 +1,8 @@
-import React, { useState } from 'react';
-import {
-    Collapse,
-    Navbar,
-    NavbarToggler,
-    NavbarBrand,
-    Nav,
-    NavItem,
-    NavLink,
-    UncontrolledDropdown,
-    DropdownToggle,
-    DropdownMenu,
-    DropdownItem,
-    NavbarText,
-} from 'reactstrap';
-
 const Items = () => (
-    <div>
-    </div>
+    <>
+        <h1>Items</h1>
+        <p>some items</p>
+    </>
 );
 
 export default Items;

@@ -10,6 +10,7 @@ import FileUploader from './components/FileUploader';
 import Menu from './components/Menu';
 import Home from './pages/Home';
 import Items from './pages/Items';
+import NoPage from './pages/NoPage';
 
 
 const DEBUG = true;
@@ -139,23 +140,23 @@ function App() {
                 <div>Disconnected</div>
             }
             {status !== Status.Disconnected &&
-                <BrowserRouter>
-                    <Routes>
-                        <Route
-                            path="/"
-                            element={<Menu />}
-                        >
-                            <Route
-                                index
-                                element={<Home />}
-                            />
-                            <Route
-                                path="items"
-                                element={<Items />}
-                            />
-                        </Route>
-                    </Routes>
-                </BrowserRouter>
+            <>
+                <Menu />
+                <Routes>
+                    <Route
+                        path="/"
+                        element={ <Home/> }
+                    />
+                    <Route
+                        path="items"
+                        element={ <Items/> }
+                    />
+                    <Route
+                        path="*"
+                        element={ <NoPage/> }
+                    />
+                </Routes>
+            </>
             }
         </div>
     );
