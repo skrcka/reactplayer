@@ -3,7 +3,13 @@ import React, {
 } from 'react';
 import axios from 'axios';
 import './App.css';
+import {
+    BrowserRouter, Routes, Route,
+} from 'react-router-dom';
 import FileUploader from './components/FileUploader';
+import Menu from './components/Menu';
+import Home from './pages/Home';
+import Items from './pages/Items';
 
 
 const DEBUG = true;
@@ -11,21 +17,44 @@ const API_URL = DEBUG ? 'http://127.0.0.1:5337' : 'http://127.0.0.1/server';
 
 const REFRESH_TIMEOUT = 5;
 
-interface RData {
-    Names: Array<string>
-    Vectors: Array<Array<number | string | boolean>>
+interface Song {
+    Id: number
+    Name: string
+    Path: string
 }
-interface Data {
-    RData: RData
-    File: boolean
-    Func: string
+
+interface Schedule {
+    Id: number
+    FileId: number
+    Time: string
+}
+
+enum Page {
+    Home,
+    Files,
+    Schedules,
+    Settings,
+}
+
+enum Status {
+    Init,
+    Disconnected,
+    Connected,
+    Running,
+    Idle,
+    Paused,
 }
 
 function App() {
     const [
-        data,
-        setData,
-    ] = useState<Data | null>(null);
+        activePage,
+        setActivePage,
+    ] = useState<Page>(Page.Home);
+
+    const [
+        status,
+        setStatus,
+    ] = useState<Status>(Status.Connected);
 
     const [
         refreshTimeout,
@@ -68,10 +97,10 @@ function App() {
             console.log('fetchData');
         }
         axios
-            .get<Data | null>(API_URL)
+            .get<Status | null>(`${API_URL}/get_status`)
             .then(res => {
-                if(res.data) {
-                    setData(res.data);
+                if(res.status) {
+                    setStatus(res.status);
                 }
             })
             .catch(err => {
@@ -105,7 +134,30 @@ function App() {
     }, []);
 
     return (
-        <div className="App"></div>
+        <div>
+            {status === Status.Disconnected &&
+                <div>Disconnected</div>
+            }
+            {status !== Status.Disconnected &&
+                <BrowserRouter>
+                    <Routes>
+                        <Route
+                            path="/"
+                            element={<Menu />}
+                        >
+                            <Route
+                                index
+                                element={<Home />}
+                            />
+                            <Route
+                                path="items"
+                                element={<Items />}
+                            />
+                        </Route>
+                    </Routes>
+                </BrowserRouter>
+            }
+        </div>
     );
 }
 
