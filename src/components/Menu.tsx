@@ -27,7 +27,7 @@ const Menu = () => {
                 light
                 expand="md"
             >
-                <NavbarBrand href="/">reactstrap</NavbarBrand>
+                <NavbarBrand href="/">Rustyplayer</NavbarBrand>
                 <NavbarToggler onClick={toggle} />
                 <Collapse
                     isOpen={isOpen}
@@ -47,7 +47,7 @@ const Menu = () => {
                             <NavLink
                                 tag={Link}
                                 to="/items/"
-                            >Items</NavLink>
+                            >Media</NavLink>
                         </NavItem>
                     </Nav>
                 </Collapse>

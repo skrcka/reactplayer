@@ -43,7 +43,7 @@
         ],
         "complexity": [
             "error",
-            10
+            15
         ],
         "curly": "warn",
         "no-eq-null": "error",
@@ -53,13 +53,7 @@
         "no-shadow": 0,
         "no-undefined": "error",
         "consistent-return": "error",
-        "camelcase": [
-            2,
-            {
-                "ignoreDestructuring": true,
-                "properties": "never"
-            }
-        ],
+        "camelcase": "off",
         "dot-notation": [
             "error",
             {
@@ -122,7 +116,7 @@
         "react/no-deprecated": "warn",
         "react/no-adjacent-inline-elements": "warn",
         "react/no-danger": "warn",
-        "react/no-multi-comp": "warn",
+        "react/no-multi-comp": "off",
         "react/no-redundant-should-component-update": "error",
         "react/no-typos": "warn",
         "react/no-unsafe": "error",
@@ -197,7 +191,7 @@
         "max-lines": [
             "error",
             {
-                "max": 300,
+                "max": 310,
                 "skipComments": true,
                 "skipBlankLines": true
             }

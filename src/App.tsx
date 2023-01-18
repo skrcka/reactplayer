@@ -4,58 +4,24 @@ import React, {
 import axios from 'axios';
 import './App.css';
 import {
-    BrowserRouter, Routes, Route,
+    Routes, Route,
 } from 'react-router-dom';
-import FileUploader from './components/FileUploader';
 import Menu from './components/Menu';
 import Home from './pages/Home';
-import Items from './pages/Items';
+import Items from './pages/Media';
 import NoPage from './pages/NoPage';
+import Consts from './Consts';
+import {
+    State, Status,
+} from './models/State';
+import { MediaFile } from './models/MediaFile';
 
-
-const DEBUG = true;
-const API_URL = DEBUG ? 'http://127.0.0.1:5337' : 'http://127.0.0.1/server';
-
-const REFRESH_TIMEOUT = 5;
-
-interface Song {
-    Id: number
-    Name: string
-    Path: string
-}
-
-interface Schedule {
-    Id: number
-    FileId: number
-    Time: string
-}
-
-enum Page {
-    Home,
-    Files,
-    Schedules,
-    Settings,
-}
-
-enum Status {
-    Init,
-    Disconnected,
-    Connected,
-    Running,
-    Idle,
-    Paused,
-}
 
 function App() {
     const [
-        activePage,
-        setActivePage,
-    ] = useState<Page>(Page.Home);
-
-    const [
-        status,
-        setStatus,
-    ] = useState<Status>(Status.Connected);
+        state,
+        setState,
+    ] = useState<State>(new State());
 
     const [
         refreshTimeout,
@@ -68,78 +34,62 @@ function App() {
         if(refreshTimeout === null){
             return;
         }
-        if (DEBUG) {
+        if (Consts.DEBUG) {
             console.log(`refresh ${refreshTimeout}`);
         }
         if(refreshTimeout == 0){
             setRefreshTimeout(null);
-            fetchData();
+            fetchStatus();
             return;
         }
         setTimeout(() => setRefreshTimeout(refreshTimeout - 1), 1000);
     }, [ refreshTimeout ]);
 
-    const getFunction = (func: string) => {
-        if (DEBUG) {
-            console.log('getFunction');
+    const updateFiles = (files: MediaFile[]) => {
+        if (Consts.DEBUG) {
+            console.log('updateFiles');
         }
-        axios
-            .get(`${API_URL}/${func}`)
-            .then(() => {
-                setTimeout(fetchData);
-            })
-            .catch(err => {
-                console.error(err);
-            });
+        setState(prevState => ({
+            status: prevState.status,
+            files: files,
+            schedules: prevState.schedules,
+        }));
     };
 
-    const fetchData = () => {
-        if (DEBUG) {
+    const fetchStatus = () => {
+        if (Consts.DEBUG) {
             console.log('fetchData');
         }
         axios
-            .get<Status | null>(`${API_URL}/get_status`)
+            .get<Status | null>(`${Consts.API_URL}/status`)
             .then(res => {
                 if(res.status) {
-                    setStatus(res.status);
+                    setState(prevState => ({
+                        status: res.status,
+                        files: prevState.files,
+                        schedules: prevState.schedules,
+                    }));
                 }
             })
             .catch(err => {
                 console.error(err);
-                setRefreshTimeout(REFRESH_TIMEOUT);
-            });
-    };
-
-    const uploadFile = (file: File) => {
-        if (DEBUG) {
-            console.log('uploadFile');
-        }
-        const formData = new FormData();
-        formData.append('file', file);
-        const headers = { 'Content-Type': 'multipart/form-data' };
-        axios
-            .post(`${API_URL}/upload`, formData, { headers })
-            .then(() => {
-                fetchData();
-            })
-            .catch(err => {
-                console.error(err);
+                setRefreshTimeout(Consts.REFRESH_TIMEOUT);
             });
     };
 
     useEffect(() => {
-        if (DEBUG) {
+        if (Consts.DEBUG) {
             console.log('initial useEffect');
         }
-        fetchData();
+        fetchStatus();
     }, []);
 
     return (
         <div>
-            {status === Status.Disconnected &&
+            {state.status === Status.Disconnected &&
                 <div>Disconnected</div>
             }
-            {status !== Status.Disconnected &&
+            {state.status !== Status.Disconnected &&
             <>
                 <Menu />
                 <Routes>
@@ -149,7 +99,12 @@ function App() {
                     />
                     <Route
                         path="items"
-                        element={ <Items/> }
+                        element={
+                            <Items
+                                files={ state.files }
+                                updateFiles={updateFiles}
+                            />
+                        }
                     />
                     <Route
                         path="*"
