@@ -46,8 +46,14 @@ const Menu = () => {
                         <NavItem>
                             <NavLink
                                 tag={Link}
-                                to="/items/"
+                                to="/media/"
                             >Media</NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink
+                                tag={Link}
+                                to="/schedules/"
+                            >Scheduler</NavLink>
                         </NavItem>
                     </Nav>
                 </Collapse>

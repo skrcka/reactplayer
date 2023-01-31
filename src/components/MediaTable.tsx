@@ -1,7 +1,4 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import Collapse from '@mui/material/Collapse';
-import IconButton from '@mui/material/IconButton';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
 import TableBody from '@mui/material/TableBody';
@@ -9,7 +6,6 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import {
     Input,
@@ -20,8 +16,9 @@ import {
     MediaFile,
 } from '../models/MediaFile';
 import {
-    useState, useEffect, useRef, RefObject,
+    useState, useEffect, useRef,
 } from 'react';
+import FileUploader from './FileUploader';
 
 
 function Row(props: {
@@ -36,7 +33,6 @@ function Row(props: {
 
     const rowLoc = useRef<HTMLTableRowElement>(null);
     const deleteLoc = useRef<HTMLButtonElement>(null);
-    const descLoc = useRef<HTMLDivElement>(null);
 
     return (
         <React.Fragment>
@@ -89,12 +85,14 @@ interface Props {
     rows?: Array<MediaFile>
     onDelete: (id: number) => void
     onPlay: (id: number) => void
+    onUpload: (file: File) => void
 }
 
 const MediaTable = ({
     rows,
     onDelete,
     onPlay,
+    onUpload,
 }: Props) => {
     const [
         filteredRows,
@@ -284,7 +282,9 @@ const MediaTable = ({
                                 onChange={event => setPathFilter(event.target.value)}
                             />
                         </TableCell>
-                        <TableCell align="center" />
+                        <TableCell align="center">
+                            <FileUploader handleFileUpload={onUpload} />
+                        </TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

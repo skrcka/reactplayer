@@ -8,13 +8,15 @@ import {
 } from 'react-router-dom';
 import Menu from './components/Menu';
 import Home from './pages/Home';
-import Items from './pages/Media';
+import Media from './pages/Media';
 import NoPage from './pages/NoPage';
 import Consts from './Consts';
 import {
     State, Status,
 } from './models/State';
 import { MediaFile } from './models/MediaFile';
+import { Schedule } from './models/Schedule';
+import Scheduler from './pages/Scheduler';
 
 
 function App() {
@@ -45,7 +47,7 @@ function App() {
         setTimeout(() => setRefreshTimeout(refreshTimeout - 1), 1000);
     }, [ refreshTimeout ]);
 
-    const updateFiles = (files: MediaFile[]) => {
+    const updateFiles = (files: Array<MediaFile>) => {
         if (Consts.DEBUG) {
             console.log('updateFiles');
         }
@@ -54,6 +56,32 @@ function App() {
             files: files,
             schedules: prevState.schedules,
         }));
+    };
+
+    const updateSchedules = (schedules: Array<Schedule>) => {
+        if (Consts.DEBUG) {
+            console.log('updateSchedules');
+            console.log(schedules);
+        }
+        setState(prevState => ({
+            status: prevState.status,
+            files: prevState.files,
+            schedules: schedules,
+        }));
+    };
+
+    const fetchFiles = () => {
+        if (Consts.DEBUG) {
+            console.log('fetchFiles');
+        }
+        axios
+            .get(`${Consts.API_URL}/files`)
+            .then(res => {
+                updateFiles(res.data);
+            })
+            .catch(err => {
+                console.error(err);
+            });
     };
 
     const fetchStatus = () => {
@@ -98,11 +126,21 @@ function App() {
                         element={ <Home/> }
                     />
                     <Route
-                        path="items"
+                        path="media"
                         element={
-                            <Items
+                            <Media
                                 files={ state.files }
-                                updateFiles={updateFiles}
+                                fetchFiles={fetchFiles}
+                            />
+                        }
+                    />
+                    <Route
+                        path="schedules"
+                        element={
+                            <Scheduler
+                                schedules={ state.schedules }
+                                files={ state.files }
+                                updateSchedules={updateSchedules}
                             />
                         }
                     />

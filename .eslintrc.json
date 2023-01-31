@@ -70,7 +70,7 @@
         ],
         "max-params": [
             "error",
-            4
+            5
         ],
         "no-duplicate-imports": [
             "error",
@@ -191,7 +191,7 @@
         "max-lines": [
             "error",
             {
-                "max": 310,
+                "max": 500,
                 "skipComments": true,
                 "skipBlankLines": true
             }

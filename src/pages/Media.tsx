@@ -1,6 +1,5 @@
 import MediaTable from '../components/MediaTable';
 import Consts from '../Consts';
-import FileUploader from '../components/FileUploader';
 import axios from 'axios';
 import { MediaFile } from '../models/MediaFile';
 import { useEffect } from 'react';
@@ -8,11 +7,11 @@ import { useEffect } from 'react';
 
 const Media = (props: {
     files: MediaFile[],
-    updateFiles: (files: MediaFile[]) => void,
+    fetchFiles: () => void,
 }) => {
     const {
         files,
-        updateFiles,
+        fetchFiles,
     } = props;
     console.log('Media');
     console.log(files);
@@ -25,25 +24,21 @@ const Media = (props: {
     }, []);
 
     const onDelete = (id: number) => {
-        axios.get(`${Consts.API_URL}/delete/${id}`);
+        if (Consts.DEBUG) {
+            console.log('onDelete');
+        }
+        axios
+            .get(`${Consts.API_URL}/delete?id=${id}`)
+            .then(() => {
+                fetchFiles();
+            });
     };
 
     const onPlay = (id: number) => {
-        axios.get(`${Consts.API_URL}/play/${id}`);
-    };
-
-    const fetchFiles = () => {
         if (Consts.DEBUG) {
-            console.log('fetchFiles');
+            console.log('onPlay');
         }
-        axios
-            .get(`${Consts.API_URL}/files`)
-            .then(res => {
-                updateFiles(res.data);
-            })
-            .catch(err => {
-                console.error(err);
-            });
+        axios.get(`${Consts.API_URL}/play?id=${id}`);
     };
 
     const uploadFile = (file: File) => {
@@ -70,6 +65,7 @@ const Media = (props: {
                 rows={files}
                 onDelete={onDelete}
                 onPlay={onPlay}
+                onUpload={uploadFile}
             />
         </>
     );
