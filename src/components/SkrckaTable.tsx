@@ -20,7 +20,6 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { Schedule } from '../models/Schedule';
 
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -35,68 +34,46 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 
 type Order = 'asc' | 'desc';
 
-function getComparator<Key extends keyof Schedule>(
+interface SkrckaTableType {
+    id: number;
+}
+
+function getComparator<T extends SkrckaTableType> (
     order: Order,
-    orderBy: Key,
+    orderBy: keyof T,
 ): (
-  a: { [key in Key]: number | string },
-  b: { [key in Key]: number | string },
+  a: T,
+  b: T,
 ) => number {
     return order === 'desc'
         ? (a, b) => descendingComparator(a, b, orderBy)
         : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-interface SkrckaCol {
+interface SkrckaCol<T extends SkrckaTableType> {
   disablePadding: boolean;
-  id: keyof Schedule;
+  id: keyof T;
   label: string;
   numeric: boolean;
 }
 
-const skrckaCol: readonly SkrckaCol[] = [
-    {
-        id: 'id',
-        numeric: true,
-        disablePadding: true,
-        label: 'Id',
-    },
-    {
-        id: 'name',
-        numeric: false,
-        disablePadding: false,
-        label: 'Name',
-    },
-    {
-        id: 'schedule',
-        numeric: false,
-        disablePadding: false,
-        label: 'Time',
-    },
-    {
-        id: 'file_id',
-        numeric: true,
-        disablePadding: true,
-        label: 'Audio',
-    },
-];
-
-interface EnhancedTableProps {
+interface EnhancedTableProps<T extends SkrckaTableType> {
+  headerCols: readonly SkrckaCol<T>[];
   numSelected: number;
-  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Schedule) => void;
+  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof T) => void;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   order: Order;
-  orderBy: string;
+  orderBy: keyof T;
   rowCount: number;
 }
 
-function EnhancedTableHead(props: EnhancedTableProps) {
+function EnhancedTableHead<T extends SkrckaTableType>(props: EnhancedTableProps<T>) {
     const {
-        onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort,
+        headerCols, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort,
     } =
     props;
     const createSortHandler =
-    (property: keyof Schedule) => (event: React.MouseEvent<unknown>) => {
+    (property: keyof T) => (event: React.MouseEvent<unknown>) => {
         onRequestSort(event, property);
     };
 
@@ -114,9 +91,9 @@ function EnhancedTableHead(props: EnhancedTableProps) {
                         }}
                     />
                 </TableCell>
-                {skrckaCol.map(headCell => (
+                {headerCols.map((headCell, index) => (
                     <TableCell
-                        key={headCell.id}
+                        key={index}
                         align={headCell.numeric ? 'right' : 'left'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
@@ -206,12 +183,62 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
     );
 }
 
-export default function SkrckaTable(
+function getHeaderCols<T extends SkrckaTableType>(obj: T) {
+    const cols: SkrckaCol<T>[] = [];
+    Object.keys(obj).map(key => {
+        cols.push({
+            id: key as keyof T,
+            numeric: true,
+            disablePadding: true,
+            label: key,
+        });
+    });
+    return cols;
+}
+/*
+const skrckaCol: readonly SkrckaCol[] = [
+    {
+        id: 'id',
+        numeric: true,
+        disablePadding: true,
+        label: 'Id',
+    },
+    {
+        id: 'name',
+        numeric: false,
+        disablePadding: false,
+        label: 'Name',
+    },
+    {
+        id: 'schedule',
+        numeric: false,
+        disablePadding: false,
+        label: 'Time',
+    },
+    {
+        id: 'file_id',
+        numeric: true,
+        disablePadding: true,
+        label: 'Audio',
+    },
+];
+*/
+
+export default function SkrckaTable<T extends SkrckaTableType>(
     props: {
-        rows: Array<Schedule>,
+        rows: Array<T>,
     },
 ) {
-    const { rows } = props;
+    const {
+        rows,
+    } = props;
+
+    if (rows.length === 0) {
+        return <div>Empty</div>;
+    }
+
+    const headerCols = getHeaderCols(rows[0]);
+
     const [
         order,
         setOrder,
@@ -219,7 +246,7 @@ export default function SkrckaTable(
     const [
         orderBy,
         setOrderBy,
-    ] = React.useState<keyof Schedule>('id');
+    ] = React.useState<keyof T>('id');
     const [
         selected,
         setSelected,
@@ -227,7 +254,7 @@ export default function SkrckaTable(
 
     const handleRequestSort = (
         event: React.MouseEvent<unknown>,
-        property: keyof Schedule,
+        property: keyof T,
     ) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -273,6 +300,7 @@ export default function SkrckaTable(
                         size='medium'
                     >
                         <EnhancedTableHead
+                            headerCols={headerCols}
                             numSelected={selected.length}
                             order={order}
                             orderBy={orderBy}
@@ -293,7 +321,7 @@ export default function SkrckaTable(
                                             role="checkbox"
                                             aria-checked={isItemSelected}
                                             tabIndex={-1}
-                                            key={row.name}
+                                            key={row.id}
                                             selected={isItemSelected}
                                         >
                                             <TableCell padding="checkbox">
@@ -305,10 +333,14 @@ export default function SkrckaTable(
                                                     }}
                                                 />
                                             </TableCell>
-                                            <TableCell align="right">{row.id}</TableCell>
-                                            <TableCell align="right">{row.name}</TableCell>
-                                            <TableCell align="right">{row.schedule}</TableCell>
-                                            <TableCell align="right">{row.file_id}</TableCell>
+                                            {Object.entries(row).map((e, index) => (
+                                                <TableCell
+                                                    key={index}
+                                                    align="right"
+                                                >
+                                                    {e[1]}
+                                                </TableCell>
+                                            ))}
                                             <TableCell align="right">
                                                 <IconButton>
                                                     <DeleteIcon />
