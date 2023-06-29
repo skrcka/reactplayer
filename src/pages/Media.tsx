@@ -28,7 +28,7 @@ const Media = (props: {
             console.log('onDelete');
         }
         axios
-            .get(`${Consts.API_URL}/delete?id=${id}`)
+            .get(`${Consts.API_URL}/delete`,{ params: { id: id } })
             .then(() => {
                 fetchFiles();
             });
@@ -39,6 +39,13 @@ const Media = (props: {
             console.log('onPlay');
         }
         axios.get(`${Consts.API_URL}/play?id=${id}`);
+    };
+
+    const onStop = () => {
+        if (Consts.DEBUG) {
+            console.log('onStop');
+        }
+        axios.get(`${Consts.API_URL}/stop`);
     };
 
     const uploadFile = (file: File) => {
@@ -66,6 +73,7 @@ const Media = (props: {
                 onDelete={onDelete}
                 onPlay={onPlay}
                 onUpload={uploadFile}
+                onStop={onStop}
             />
         </>
     );

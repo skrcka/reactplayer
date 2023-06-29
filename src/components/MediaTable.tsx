@@ -7,6 +7,11 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+
+
+import DeleteIcon from '@mui/icons-material/Delete';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+
 import {
     Input,
 } from 'reactstrap';
@@ -60,20 +65,51 @@ function Row(props: {
                 <TableCell align="center">
                     <Button
                         onClick={()=>onPlay(row.id)}
+                        sx={{
+                            borderRadius: '10%',
+                            width: '30px',
+                            height: '30px',
+                        }}
                         variant="outlined"
                         color="success"
                         className='m-1'
+                        style={{ border: 'none' }}
+                        onMouseEnter={e => e.currentTarget.style.border = '1px solid gray'}
+                        onMouseLeave={e => e.currentTarget.style.border = 'none'}
                     >
-                        Play
+                        <PlayArrowIcon
+                            titleAccess='Delete'
+                            style={{ fontSize: '24px' }}
+                            sx = {{
+                                padding: '0px',
+                                margin: '0px',
+                            }}
+                        />
                     </Button>
                     <Button
+                        sx={{
+                            borderRadius: '10%',
+                            width: '30px',
+                            height: '30px',
+                        }}
+
                         onClick={()=>onDelete(row.id)}
                         variant="outlined"
                         color="error"
                         className='m-1'
                         ref={deleteLoc}
+                        style={{ border: 'none' }}
+                        onMouseEnter={e => e.currentTarget.style.border = '1px solid red'}
+                        onMouseLeave={e => e.currentTarget.style.border = 'none'}
                     >
-                        Delete
+                        <DeleteIcon
+                            titleAccess='Delete'
+                            style={{ fontSize: '24px' }}
+                            sx = {{
+                                padding: '0px',
+                                margin: '0px',
+                            }}
+                        />
                     </Button>
                 </TableCell>
             </TableRow>
@@ -86,6 +122,7 @@ interface Props {
     onDelete: (id: number) => void
     onPlay: (id: number) => void
     onUpload: (file: File) => void
+    onStop: () => void
 }
 
 const MediaTable = ({
@@ -93,6 +130,7 @@ const MediaTable = ({
     onDelete,
     onPlay,
     onUpload,
+    onStop,
 }: Props) => {
     const [
         filteredRows,

@@ -1,4 +1,5 @@
 import SkrckaTable from '../components/SkrckaTable';
+import ObjectTable from '../components/ObjectTable';
 import Consts from '../Consts';
 import axios from 'axios';
 import { Schedule } from '../models/Schedule';
@@ -92,11 +93,14 @@ const Scheduler = (props: {
     };
 
     return (
-        <SkrckaTable
+        <ObjectTable
             rows={schedules}
             // files={files}
             // onRemove={onRemove}
-            // onEdit={onEdit}
+            expandable={true}
+            onSelect={onSetActive}
+            onDelete={onRemove}
+            onEdit={onEdit}
             // onSetActive={onSetActive}
             // onUpload={uploadSchedule}
         />
